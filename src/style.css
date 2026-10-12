@@ -1,0 +1,41 @@
+:root {
+  --bg: #fbf8f3;
+  --fg: #2a211b;
+  --muted: #7a6c60;
+  --accent: #a4472b;
+  --border: #e3d9cc;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d1814;
+    --fg: #f1e9df;
+    --muted: #a39384;
+    --accent: #e08a67;
+    --border: #3a3028;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: Georgia, "Times New Roman", serif; color: var(--fg); background: var(--bg); }
+#map { position: absolute; inset: 0; }
+#panel {
+  position: absolute; top: 16px; left: 16px; width: min(340px, calc(100% - 32px));
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.18);
+}
+h1 { margin: 0 0 8px; font-size: 20px; letter-spacing: .02em; }
+#era-name { font-size: 15px; color: var(--accent); font-weight: bold; }
+#era-blurb { margin: 4px 0 12px; font-size: 13px; line-height: 1.45; color: var(--muted); min-height: 3.9em; }
+#year-label { font-size: 28px; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+#slider { width: 100%; accent-color: var(--accent); }
+#controls { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+#eras { display: flex; flex-wrap: wrap; gap: 6px; }
+button {
+  font: inherit; font-size: 12px; cursor: pointer; color: var(--fg);
+  background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px;
+}
+button:hover, button.active { border-color: var(--accent); color: var(--accent); }
+#play { align-self: flex-start; }
+#count { margin-top: 10px; font-size: 12px; color: var(--muted); }
+.maplibregl-popup-content { font-family: Georgia, serif; }
+.maplibregl-popup-content h3 { margin: 0 0 4px; font-size: 15px; }
+.maplibregl-popup-content p { margin: 0; font-size: 12px; color: #555; }

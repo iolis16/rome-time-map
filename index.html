@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rome Through Time</title>
+    <meta name="description" content="An interactive map of Rome's monuments and sites across 2,800 years." />
+  </head>
+  <body>
+    <div id="map"></div>
+    <aside id="panel">
+      <h1>Rome Through Time</h1>
+      <div id="era-name"></div>
+      <p id="era-blurb"></p>
+      <div id="year-label"></div>
+      <input id="slider" type="range" aria-label="Year" />
+      <div id="controls">
+        <button id="play" type="button">Play</button>
+        <div id="eras"></div>
+      </div>
+      <div id="count"></div>
+    </aside>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

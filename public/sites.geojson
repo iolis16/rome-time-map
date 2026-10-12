@@ -1,0 +1,15 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4853,41.8925]},"properties":{"name":"Roman Forum","type":"civic","start_year":-600,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4850,41.8861]},"properties":{"name":"Circus Maximus","type":"entertainment","start_year":-600,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4829,41.8934]},"properties":{"name":"Temple of Jupiter Capitolinus","type":"religious","start_year":-509,"end_year":400,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4922,41.8902]},"properties":{"name":"Colosseum","type":"entertainment","start_year":80,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4769,41.8986]},"properties":{"name":"Pantheon","type":"religious","start_year":126,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4924,41.8791]},"properties":{"name":"Baths of Caracalla","type":"civic","start_year":216,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4983,41.8977]},"properties":{"name":"Santa Maria Maggiore","type":"religious","start_year":432,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4534,41.9022]},"properties":{"name":"St. Peter's Basilica","type":"religious","start_year":1626,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4833,41.9009]},"properties":{"name":"Trevi Fountain","type":"civic","start_year":1762,"source":"seed"}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[12.4833,41.8946]},"properties":{"name":"Vittoriano","type":"civic","start_year":1935,"source":"seed"}}
+  ]
+}

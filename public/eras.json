@@ -1,0 +1,9 @@
+[
+  { "name": "Kingdom & early Republic", "start": -753, "end": -300, "blurb": "Villages on the hills merge into a city. The Forum is drained, the Capitoline temple rises, and the Servian Wall is built." },
+  { "name": "Republic", "start": -299, "end": -28, "blurb": "Rome conquers the Mediterranean. Basilicas, aqueducts, and the first great theatres reshape the centre." },
+  { "name": "Early Empire", "start": -27, "end": 180, "blurb": "Augustus finds a city of brick and leaves one of marble. The Colosseum, Pantheon, and imperial fora are built." },
+  { "name": "Late Empire", "start": 181, "end": 476, "blurb": "Vast baths and the Aurelian Wall; Christian basilicas begin to appear alongside pagan temples." },
+  { "name": "Medieval", "start": 477, "end": 1399, "blurb": "The population collapses and ruins become quarries and pastures. Churches and fortified towers dot the old city." },
+  { "name": "Renaissance & Baroque", "start": 1400, "end": 1799, "blurb": "Popes rebuild Rome: St. Peter's, piazzas, fountains, and Bernini's theatrical city." },
+  { "name": "Modern", "start": 1800, "end": 2025, "blurb": "Capital of a unified Italy. Excavations uncover the ancient city beneath new boulevards and monuments." }
+]
