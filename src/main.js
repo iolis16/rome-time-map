@@ -22,6 +22,8 @@ const els = {
   eras: document.getElementById('eras'),
   play: document.getElementById('play'),
   count: document.getElementById('count'),
+  legend: document.getElementById('legend'),
+  showAll: document.getElementById('show-all'),
 };
 
 const formatYear = (y) => (y < 0 ? `${-y} BC` : y === 0 ? '1 BC' : `${y} AD`);
@@ -44,13 +46,40 @@ async function main() {
 
   const colorExpr = ['match', ['get', 'type'], ...Object.entries(TYPE_COLORS).filter(([k]) => k !== 'other').flat(), TYPE_COLORS.other];
 
-  function yearFilter(year) {
+  const allTypes = Object.keys(TYPE_COLORS);
+  const activeTypes = new Set(allTypes);
+
+  function mapFilter(year) {
     return [
       'all',
       ['<=', ['get', 'start_year'], year],
       ['any', ['!', ['has', 'end_year']], ['>=', ['get', 'end_year'], year]],
+      ['in', ['get', 'type'], ['literal', [...activeTypes]]],
     ];
   }
+
+  const standing = (p, year) => p.start_year <= year && (p.end_year == null || p.end_year >= year);
+
+  const legendCounts = {};
+  for (const type of allTypes) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'legend-item';
+    b.setAttribute('aria-pressed', 'true');
+    b.style.setProperty('--c', TYPE_COLORS[type]);
+    b.innerHTML = '<span class="swatch"></span><span class="label"></span><span class="n"></span>';
+    b.querySelector('.label').textContent = type;
+    b.addEventListener('click', () => {
+      if (!activeTypes.delete(type)) activeTypes.add(type);
+      update(Number(els.slider.value));
+    });
+    legendCounts[type] = { button: b, n: b.querySelector('.n') };
+    els.legend.append(b);
+  }
+  els.showAll.addEventListener('click', () => {
+    allTypes.forEach((t) => activeTypes.add(t));
+    update(Number(els.slider.value));
+  });
 
   function eraFor(year) {
     return eras.find((e) => year >= e.start && year <= e.end) ?? eras[eras.length - 1];
@@ -62,12 +91,27 @@ async function main() {
     els.eraName.textContent = era.name;
     els.eraBlurb.textContent = era.blurb;
     els.eras.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.name === era.name));
-    if (map.getLayer('sites')) map.setFilter('sites', yearFilter(year));
-    const visible = sites.features.filter((f) => {
+    if (map.getLayer('sites')) map.setFilter('sites', mapFilter(year));
+    const byType = Object.fromEntries(allTypes.map((t) => [t, 0]));
+    for (const f of sites.features) {
       const p = f.properties;
-      return p.start_year <= year && (p.end_year == null || p.end_year >= year);
-    }).length;
-    els.count.textContent = `${visible} of ${sites.features.length} sites standing`;
+      if (standing(p, year)) byType[p.type] = (byType[p.type] ?? 0) + 1;
+    }
+    let shown = 0;
+    let total = 0;
+    for (const t of allTypes) {
+      const { button, n } = legendCounts[t];
+      const on = activeTypes.has(t);
+      button.classList.toggle('off', !on);
+      button.setAttribute('aria-pressed', String(on));
+      n.textContent = byType[t];
+      total += byType[t];
+      if (on) shown += byType[t];
+    }
+    els.showAll.hidden = activeTypes.size === allTypes.length;
+    els.count.textContent = shown === total
+      ? `${total} of ${sites.features.length} sites standing`
+      : `${shown} shown (${total} of ${sites.features.length} sites standing)`;
   }
 
   for (const era of eras) {
@@ -108,7 +152,7 @@ async function main() {
       id: 'sites',
       type: 'circle',
       source: 'sites',
-      filter: yearFilter(Number(els.slider.value)),
+      filter: mapFilter(Number(els.slider.value)),
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 4, 16, 9],
         'circle-color': colorExpr,
