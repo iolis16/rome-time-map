@@ -2,12 +2,15 @@
 
 An interactive map of Rome's monuments and sites across ~2,800 years, with a time slider that shows what was standing in each era.
 
+**Live site: https://rome-time-map.vercel.app**
+
 ## Run it
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # static output in dist/
+npx vercel deploy --prod   # publish (project is not Git-connected, so deploys are manual)
 ```
 
 ## Stack
