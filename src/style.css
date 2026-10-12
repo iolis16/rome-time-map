@@ -22,19 +22,21 @@ html, body { margin: 0; height: 100%; font-family: Georgia, "Times New Roman", s
   background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
   padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.18);
 }
-h1 { margin: 0 0 8px; font-size: 20px; letter-spacing: .02em; }
+#panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+h1 { margin: 0; font-size: 20px; letter-spacing: .02em; }
+#panel-toggle { display: none; }
+#year-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#details { margin-top: 4px; }
 #era-name { font-size: 15px; color: var(--accent); font-weight: bold; }
-#era-blurb { margin: 4px 0 12px; font-size: 13px; line-height: 1.45; color: var(--muted); min-height: 3.9em; }
+#era-blurb { margin: 8px 0 10px; font-size: 13px; line-height: 1.45; color: var(--muted); min-height: 3.9em; }
 #year-label { font-size: 28px; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
 #slider { width: 100%; accent-color: var(--accent); }
-#controls { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 #eras { display: flex; flex-wrap: wrap; gap: 6px; }
 button {
   font: inherit; font-size: 12px; cursor: pointer; color: var(--fg);
   background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px;
 }
 button:hover, button.active { border-color: var(--accent); color: var(--accent); }
-#play { align-self: flex-start; }
 #panel { max-height: calc(100% - 32px); overflow-y: auto; }
 #overlay { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; }
 #overlay label { display: flex; justify-content: space-between; margin: 8px 0 4px; }
@@ -67,3 +69,32 @@ button:hover, button.active { border-color: var(--accent); color: var(--accent);
 .maplibregl-popup-content { font-family: Georgia, serif; }
 .maplibregl-popup-content h3 { margin: 0 0 4px; font-size: 15px; }
 .maplibregl-popup-content p { margin: 0; font-size: 12px; color: #555; }
+
+/* Phones: the panel becomes a bottom sheet. The time controls stay visible; the rest is behind "Details". */
+@media (max-width: 640px) {
+  #panel {
+    top: auto; left: 0; right: 0; bottom: 0; width: 100%;
+    max-height: 78vh; max-height: 78dvh;
+    border-width: 1px 0 0; border-radius: 14px 14px 0 0;
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+  }
+  #panel-head { margin-bottom: 4px; }
+  h1 { font-size: 16px; }
+  #panel-toggle { display: inline-block; min-height: 34px; padding: 4px 14px; font-size: 13px; }
+  #panel-toggle::after { content: " \25B4"; }
+  #panel.open #panel-toggle::after { content: " \25BE"; }
+  #details { display: none; }
+  #panel.open #details { display: block; }
+  #year-label { font-size: 24px; }
+  #play { min-height: 34px; padding: 4px 16px; font-size: 13px; }
+  #slider { height: 32px; }
+  #eras { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  #eras button { flex: none; min-height: 32px; font-size: 13px; }
+  #era-blurb { min-height: 0; }
+  #overlay select { font-size: 16px; min-height: 40px; }
+  .legend-item { min-height: 38px; font-size: 14px; }
+  #walls-row { font-size: 14px; }
+  #walls-toggle { width: 18px; height: 18px; margin-right: 6px; vertical-align: -3px; }
+  /* keep the attribution (a licence requirement) just above the sheet */
+  .maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right { bottom: var(--sheet-h, 0px); }
+}

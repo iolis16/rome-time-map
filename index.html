@@ -9,31 +9,38 @@
   <body>
     <div id="map"></div>
     <aside id="panel">
-      <h1>Rome Through Time</h1>
-      <div id="era-name"></div>
-      <p id="era-blurb"></p>
-      <div id="year-label"></div>
-      <input id="slider" type="range" aria-label="Year" />
-      <div id="controls">
-        <button id="play" type="button">Play</button>
+      <header id="panel-head">
+        <h1>Rome Through Time</h1>
+        <button id="panel-toggle" type="button" aria-expanded="false" aria-controls="details">Details</button>
+      </header>
+      <div id="timebar">
+        <div id="era-name"></div>
+        <div id="year-row">
+          <div id="year-label"></div>
+          <button id="play" type="button">Play</button>
+        </div>
+        <input id="slider" type="range" aria-label="Year" />
+      </div>
+      <div id="details">
+        <p id="era-blurb"></p>
         <div id="eras"></div>
+        <div id="count"></div>
+        <div id="overlay">
+          <label for="map-mode">Historical map</label>
+          <select id="map-mode"></select>
+          <label for="map-opacity">Opacity <span id="map-opacity-value"></span></label>
+          <input id="map-opacity" type="range" min="0" max="100" value="55" />
+          <p id="map-caption"></p>
+        </div>
+        <label id="walls-row"><input id="walls-toggle" type="checkbox" checked />
+          City walls
+          <span class="wall-key"><i style="--c:#8b5a2b"></i>Servian <i style="--c:#444"></i>Aurelian <i style="--c:#7a4b9a"></i>Leonine</span>
+          <span class="wall-key">Dashed = reconstructed (Clarke 1830), approximate</span>
+        </label>
+        <div id="legend" role="group" aria-label="Filter by type"></div>
+        <p id="legend-note"><span class="swatch faded"></span> Faded: dated only by historical period</p>
+        <button id="show-all" type="button" hidden>Show all types</button>
       </div>
-      <div id="count"></div>
-      <div id="overlay">
-        <label for="map-mode">Historical map</label>
-        <select id="map-mode"></select>
-        <label for="map-opacity">Opacity <span id="map-opacity-value"></span></label>
-        <input id="map-opacity" type="range" min="0" max="100" value="55" />
-        <p id="map-caption"></p>
-      </div>
-      <label id="walls-row"><input id="walls-toggle" type="checkbox" checked />
-        City walls
-        <span class="wall-key"><i style="--c:#8b5a2b"></i>Servian <i style="--c:#444"></i>Aurelian <i style="--c:#7a4b9a"></i>Leonine</span>
-        <span class="wall-key">Dashed = reconstructed (Clarke 1830), approximate</span>
-      </label>
-      <div id="legend" role="group" aria-label="Filter by type"></div>
-      <p id="legend-note"><span class="swatch faded"></span> Faded: dated only by historical period</p>
-      <button id="show-all" type="button" hidden>Show all types</button>
     </aside>
     <script type="module" src="/src/main.js"></script>
   </body>

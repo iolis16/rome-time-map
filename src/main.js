@@ -94,7 +94,7 @@ async function main() {
   els.slider.value = 100;
 
   const map = new maplibregl.Map({ container: 'map', style: STYLE, center: ROME, zoom: 13.5 });
-  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
   const colorExpr = ['match', ['get', 'type'], ...Object.entries(TYPE_COLORS).filter(([k]) => k !== 'other').flat(), TYPE_COLORS.other];
 
@@ -184,6 +184,20 @@ async function main() {
   }
 
   els.slider.addEventListener('input', () => update(Number(els.slider.value)));
+
+  // Mobile bottom sheet: expand/collapse details, and tell the CSS how tall the sheet is.
+  const panel = document.getElementById('panel');
+  const toggle = document.getElementById('panel-toggle');
+  toggle.addEventListener('click', () => {
+    const open = panel.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.firstChild.textContent = open ? 'Hide' : 'Details';
+  });
+  const mobile = window.matchMedia('(max-width: 640px)');
+  const syncSheetHeight = () =>
+    document.documentElement.style.setProperty('--sheet-h', mobile.matches ? `${panel.offsetHeight}px` : '0px');
+  new ResizeObserver(syncSheetHeight).observe(panel);
+  mobile.addEventListener('change', syncSheetHeight);
 
   let timer = null;
   els.play.addEventListener('click', () => {
