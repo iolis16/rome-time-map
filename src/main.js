@@ -4,6 +4,11 @@ import './style.css';
 
 const ROME = [12.4839, 41.8967];
 const STYLE = 'https://tiles.openfreemap.org/styles/positron';
+// Nolli's 1748 "Pianta Grande di Roma", georeferenced by Univ. of Oregon / Stanford CSTA (CC BY-NC-SA 4.0).
+const NOLLI_TILES = 'https://stacks.stanford.edu/file/nn217br6628/{z}/{x}/{y}.png';
+const NOLLI_BOUNDS = [12.441, 41.862, 12.527, 41.921];
+const NOLLI_ATTRIBUTION =
+  '<a href="https://purl.stanford.edu/nn217br6628" target="_blank" rel="noopener">Nolli map: Univ. of Oregon / Stanford CSTA, CC BY-NC-SA 4.0</a>';
 const TYPE_COLORS = {
   religious: '#a4472b',
   civic: '#2f6f8f',
@@ -24,6 +29,8 @@ const els = {
   count: document.getElementById('count'),
   legend: document.getElementById('legend'),
   showAll: document.getElementById('show-all'),
+  nolli: document.getElementById('nolli-opacity'),
+  nolliValue: document.getElementById('nolli-value'),
 };
 
 const formatYear = (y) => (y < 0 ? `${-y} BC` : y === 0 ? '1 BC' : `${y} AD`);
@@ -146,7 +153,31 @@ async function main() {
     }, 40);
   });
 
+  const setNolli = () => {
+    const pct = Number(els.nolli.value);
+    els.nolliValue.textContent = `${pct}%`;
+    if (map.getLayer('nolli')) map.setPaintProperty('nolli', 'raster-opacity', pct / 100);
+  };
+  els.nolli.addEventListener('input', setNolli);
+
   map.on('load', () => {
+    map.addSource('nolli', {
+      type: 'raster',
+      tiles: [NOLLI_TILES],
+      tileSize: 512,
+      minzoom: 10,
+      maxzoom: 18,
+      bounds: NOLLI_BOUNDS,
+      attribution: NOLLI_ATTRIBUTION,
+    });
+    map.addLayer({
+      id: 'nolli',
+      type: 'raster',
+      source: 'nolli',
+      paint: { 'raster-opacity': Number(els.nolli.value) / 100, 'raster-fade-duration': 0 },
+    });
+    setNolli();
+
     map.addSource('sites', { type: 'geojson', data: sites });
     map.addLayer({
       id: 'sites',

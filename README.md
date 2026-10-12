@@ -33,4 +33,5 @@ python3 -I data/prep.py data/raw public/sites.geojson
 ## Attribution
 - [Pleiades](https://pleiades.stoa.org/) — CC BY
 - [Wikidata](https://www.wikidata.org/) — CC0
+- [La Pianta Grande di Roma (Nolli, 1748), georeferenced](https://purl.stanford.edu/nn217br6628) — University of Oregon / Stanford CSTA, CC BY-NC-SA 4.0 (non-commercial use only)
 - [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors — ODbL; basemap tiles via [OpenFreeMap](https://openfreemap.org/)
