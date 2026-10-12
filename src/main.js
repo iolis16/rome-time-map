@@ -7,8 +7,11 @@ const STYLE = 'https://tiles.openfreemap.org/styles/positron';
 const TYPE_COLORS = {
   religious: '#a4472b',
   civic: '#2f6f8f',
-  entertainment: '#8a6d1d',
-  other: '#6b6b6b',
+  entertainment: '#b8860b',
+  residential: '#6a4c93',
+  funerary: '#4a4a4a',
+  infrastructure: '#2e8b57',
+  other: '#8c8c8c',
 };
 
 const els = {
@@ -109,7 +112,8 @@ async function main() {
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 4, 16, 9],
         'circle-color': colorExpr,
-        'circle-stroke-color': '#fff',
+        'circle-opacity': ['case', ['==', ['get', 'date_precision'], 'period'], 0.35, 0.9],
+        'circle-stroke-color': ['case', ['==', ['get', 'date_precision'], 'period'], colorExpr, '#fff'],
         'circle-stroke-width': 1.5,
       },
     });
@@ -124,6 +128,26 @@ async function main() {
       const d = document.createElement('p');
       d.textContent = `${p.type} · ${dates}`;
       node.append(h, d);
+      if (p.date_precision && p.date_precision !== 'year') {
+        const n = document.createElement('p');
+        n.textContent = p.date_precision === 'period'
+          ? 'Date is the start of its historical period, not a construction date.'
+          : `Date known to the ${p.date_precision}.`;
+        node.append(n);
+      }
+      if (p.description) {
+        const ds = document.createElement('p');
+        ds.textContent = p.description;
+        node.append(ds);
+      }
+      if (p.wikipedia_url) {
+        const a = document.createElement('a');
+        a.href = p.wikipedia_url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = 'Wikipedia';
+        node.append(a);
+      }
       new maplibregl.Popup({ offset: 10 }).setLngLat(f.geometry.coordinates).setDOMContent(node).addTo(map);
     });
     map.on('mouseenter', 'sites', () => (map.getCanvas().style.cursor = 'pointer'));
