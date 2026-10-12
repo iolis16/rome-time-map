@@ -1,0 +1,7 @@
+# Keep the upload to what the build needs. data/raw holds ~600 MB of source downloads.
+data/raw
+node_modules
+dist
+.git
+.claude
+.vercel
