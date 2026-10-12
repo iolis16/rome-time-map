@@ -45,6 +45,10 @@ button:hover, button.active { border-color: var(--accent); color: var(--accent);
   border: 1px solid var(--border); border-radius: 6px; padding: 5px 6px;
 }
 #map-caption { margin: 8px 0 0; font-size: 11px; line-height: 1.4; color: var(--muted); min-height: 2.8em; }
+#walls-row { display: block; margin-top: 12px; font-size: 13px; }
+.wall-key { display: block; margin: 2px 0 0 22px; font-size: 11px; color: var(--muted); }
+.wall-key i { display: inline-block; width: 14px; height: 3px; background: var(--c); margin: 0 4px 2px 8px; vertical-align: middle; }
+.wall-key i:first-child { margin-left: 0; }
 #legend { display: flex; flex-direction: column; gap: 2px; margin-top: 10px; }
 .legend-item {
   display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;

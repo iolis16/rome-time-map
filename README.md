@@ -30,6 +30,10 @@ python3 -I data/prep.py data/raw public/sites.geojson
 
 **How dates work.** Wikidata supplies real inception dates (year, decade, or century precision) and wins when both sources describe the same place. Pleiades only provides *period buckets* (e.g. "Roman" starts at 30 BC), so those sites carry `date_precision: "period"` and are drawn faded on the map; their start year is the start of the period, not a construction date.
 
+### City walls
+
+`public/walls.geojson` comes from OpenStreetMap via Overpass (`data/walls.overpassql`, then `data/prep_walls.py`). Coverage is partial: the Aurelian Wall is ~80% mapped (~15 of ~19 km), while the Servian Wall is only scattered surviving fragments (~1 km of ~11 km). Start dates: Servian 378 BC, Aurelian 271 AD, Leonine 848 AD.
+
 ## Historical maps
 
 The map selector switches between georeferenced historical maps (Auto follows the slider):

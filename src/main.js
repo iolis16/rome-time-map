@@ -49,6 +49,7 @@ const HISTORICAL_MAPS = [
       '<a href="https://purl.stanford.edu/qs159bn5216" target="_blank" rel="noopener">Clarke 1830, David Rumsey Map Collection / Stanford, CC BY-NC-SA 3.0</a>',
   },
 ];
+const WALL_COLORS = { servian: '#8b5a2b', aurelian: '#444444', leonine: '#7a4b9a' };
 const TYPE_COLORS = {
   religious: '#a4472b',
   civic: '#2f6f8f',
@@ -73,14 +74,16 @@ const els = {
   mapOpacity: document.getElementById('map-opacity'),
   mapOpacityValue: document.getElementById('map-opacity-value'),
   mapCaption: document.getElementById('map-caption'),
+  wallsToggle: document.getElementById('walls-toggle'),
 };
 
 const formatYear = (y) => (y < 0 ? `${-y} BC` : y === 0 ? '1 BC' : `${y} AD`);
 
 async function main() {
-  const [eras, sites] = await Promise.all([
+  const [eras, sites, walls] = await Promise.all([
     fetch('/eras.json').then((r) => r.json()),
     fetch('/sites.geojson').then((r) => r.json()),
+    fetch('/walls.geojson').then((r) => r.json()),
   ]);
 
   const minYear = eras[0].start;
@@ -141,6 +144,7 @@ async function main() {
     els.eraBlurb.textContent = era.blurb;
     els.eras.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.name === era.name));
     if (map.getLayer('sites')) map.setFilter('sites', mapFilter(year));
+    if (map.getLayer('walls')) map.setFilter('walls', ['<=', ['get', 'start_year'], year]);
     applyHistoricalMap(year);
     const byType = Object.fromEntries(allTypes.map((t) => [t, 0]));
     for (const f of sites.features) {
@@ -255,6 +259,26 @@ async function main() {
     }
     mapsReady = true;
     applyHistoricalMap(Number(els.slider.value));
+
+    map.addSource('walls', {
+      type: 'geojson',
+      data: walls,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+    });
+    map.addLayer({
+      id: 'walls',
+      type: 'line',
+      source: 'walls',
+      filter: ['<=', ['get', 'start_year'], Number(els.slider.value)],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': ['match', ['get', 'wall'], ...Object.entries(WALL_COLORS).flat(), '#444444'],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1.5, 16, 4],
+        'line-opacity': 0.9,
+      },
+    });
+    els.wallsToggle.addEventListener('change', () =>
+      map.setLayoutProperty('walls', 'visibility', els.wallsToggle.checked ? 'visible' : 'none'));
 
     map.addSource('sites', { type: 'geojson', data: sites });
     map.addLayer({
