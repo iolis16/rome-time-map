@@ -20,8 +20,11 @@
       </div>
       <div id="count"></div>
       <div id="overlay">
-        <label for="nolli-opacity">1748 Nolli map <span id="nolli-value"></span></label>
-        <input id="nolli-opacity" type="range" min="0" max="100" value="55" />
+        <label for="map-mode">Historical map</label>
+        <select id="map-mode"></select>
+        <label for="map-opacity">Opacity <span id="map-opacity-value"></span></label>
+        <input id="map-opacity" type="range" min="0" max="100" value="55" />
+        <p id="map-caption"></p>
       </div>
       <div id="legend" role="group" aria-label="Filter by type"></div>
       <p id="legend-note"><span class="swatch faded"></span> Faded: dated only by historical period</p>

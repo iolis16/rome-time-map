@@ -4,11 +4,51 @@ import './style.css';
 
 const ROME = [12.4839, 41.8967];
 const STYLE = 'https://tiles.openfreemap.org/styles/positron';
-// Nolli's 1748 "Pianta Grande di Roma", georeferenced by Univ. of Oregon / Stanford CSTA (CC BY-NC-SA 4.0).
-const NOLLI_TILES = 'https://stacks.stanford.edu/file/nn217br6628/{z}/{x}/{y}.png';
-const NOLLI_BOUNDS = [12.441, 41.862, 12.527, 41.921];
-const NOLLI_ATTRIBUTION =
-  '<a href="https://purl.stanford.edu/nn217br6628" target="_blank" rel="noopener">Nolli map: Univ. of Oregon / Stanford CSTA, CC BY-NC-SA 4.0</a>';
+// Historical base maps. `from`/`to` are the slider years each one is shown for in Auto mode.
+// Nolli: Univ. of Oregon / Stanford CSTA (CC BY-NC-SA 4.0). Clarke: David Rumsey Map Collection,
+// courtesy Stanford University Libraries (CC BY-NC-SA 3.0); cropped and retiled by this project
+// (see data/tile_map.py). Clarke's "ancient Rome" is a 1830 scholarly reconstruction, not a survey.
+const HISTORICAL_MAPS = [
+  {
+    id: 'ancient',
+    label: 'Ancient Rome (Clarke, 1830)',
+    caption: "W. B. Clarke's 1830 plan of ancient Rome: a 19th-century reconstruction, not a survey.",
+    tiles: '/tiles/clarke-ancient/{z}/{x}/{y}.webp',
+    bounds: [12.44714, 41.872569, 12.52164, 41.913429],
+    minzoom: 11,
+    maxzoom: 16,
+    from: -753,
+    to: 476,
+    attribution:
+      '<a href="https://purl.stanford.edu/dy213ky1514" target="_blank" rel="noopener">Clarke 1830, David Rumsey Map Collection / Stanford, CC BY-NC-SA 3.0</a>',
+  },
+  {
+    id: 'nolli',
+    label: 'Rome in 1748 (Nolli)',
+    caption: "Giambattista Nolli's 1748 Pianta Grande, the first accurate ground plan of Rome.",
+    tiles: 'https://stacks.stanford.edu/file/nn217br6628/{z}/{x}/{y}.png',
+    bounds: [12.441, 41.862, 12.527, 41.921],
+    minzoom: 10,
+    maxzoom: 18,
+    from: 1400,
+    to: 1799,
+    attribution:
+      '<a href="https://purl.stanford.edu/nn217br6628" target="_blank" rel="noopener">Nolli map: Univ. of Oregon / Stanford CSTA, CC BY-NC-SA 4.0</a>',
+  },
+  {
+    id: 'modern',
+    label: 'Rome in 1830 (Clarke)',
+    caption: "W. B. Clarke's 1830 plan of modern Rome, just before unification and the railways.",
+    tiles: '/tiles/clarke-modern/{z}/{x}/{y}.webp',
+    bounds: [12.445194, 41.87252, 12.52006, 41.913572],
+    minzoom: 11,
+    maxzoom: 16,
+    from: 1800,
+    to: 2025,
+    attribution:
+      '<a href="https://purl.stanford.edu/qs159bn5216" target="_blank" rel="noopener">Clarke 1830, David Rumsey Map Collection / Stanford, CC BY-NC-SA 3.0</a>',
+  },
+];
 const TYPE_COLORS = {
   religious: '#a4472b',
   civic: '#2f6f8f',
@@ -29,8 +69,10 @@ const els = {
   count: document.getElementById('count'),
   legend: document.getElementById('legend'),
   showAll: document.getElementById('show-all'),
-  nolli: document.getElementById('nolli-opacity'),
-  nolliValue: document.getElementById('nolli-value'),
+  mapMode: document.getElementById('map-mode'),
+  mapOpacity: document.getElementById('map-opacity'),
+  mapOpacityValue: document.getElementById('map-opacity-value'),
+  mapCaption: document.getElementById('map-caption'),
 };
 
 const formatYear = (y) => (y < 0 ? `${-y} BC` : y === 0 ? '1 BC' : `${y} AD`);
@@ -99,6 +141,7 @@ async function main() {
     els.eraBlurb.textContent = era.blurb;
     els.eras.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.name === era.name));
     if (map.getLayer('sites')) map.setFilter('sites', mapFilter(year));
+    applyHistoricalMap(year);
     const byType = Object.fromEntries(allTypes.map((t) => [t, 0]));
     for (const f of sites.features) {
       const p = f.properties;
@@ -153,30 +196,65 @@ async function main() {
     }, 40);
   });
 
-  const setNolli = () => {
-    const pct = Number(els.nolli.value);
-    els.nolliValue.textContent = `${pct}%`;
-    if (map.getLayer('nolli')) map.setPaintProperty('nolli', 'raster-opacity', pct / 100);
-  };
-  els.nolli.addEventListener('input', setNolli);
+  let mapsReady = false;
+
+  function activeHistoricalMap(year) {
+    const mode = els.mapMode.value;
+    if (mode === 'none') return null;
+    if (mode !== 'auto') return HISTORICAL_MAPS.find((m) => m.id === mode) ?? null;
+    return HISTORICAL_MAPS.find((m) => year >= m.from && year <= m.to) ?? null;
+  }
+
+  function applyHistoricalMap(year) {
+    const pct = Number(els.mapOpacity.value);
+    els.mapOpacityValue.textContent = `${pct}%`;
+    const active = activeHistoricalMap(year);
+    const auto = els.mapMode.value === 'auto';
+    els.mapCaption.textContent = active
+      ? active.caption
+      : auto
+        ? 'No georeferenced map is available for this period.'
+        : '';
+    if (!mapsReady) return;
+    for (const m of HISTORICAL_MAPS) {
+      const id = `map-${m.id}`;
+      const on = m === active;
+      map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none');
+      map.setPaintProperty(id, 'raster-opacity', pct / 100);
+    }
+  }
+
+  const modeOptions = [['auto', 'Auto (follows the slider)'], ['none', 'None'], ...HISTORICAL_MAPS.map((m) => [m.id, m.label])];
+  for (const [value, label] of modeOptions) {
+    const o = document.createElement('option');
+    o.value = value;
+    o.textContent = label;
+    els.mapMode.append(o);
+  }
+  els.mapMode.addEventListener('change', () => applyHistoricalMap(Number(els.slider.value)));
+  els.mapOpacity.addEventListener('input', () => applyHistoricalMap(Number(els.slider.value)));
 
   map.on('load', () => {
-    map.addSource('nolli', {
-      type: 'raster',
-      tiles: [NOLLI_TILES],
-      tileSize: 512,
-      minzoom: 10,
-      maxzoom: 18,
-      bounds: NOLLI_BOUNDS,
-      attribution: NOLLI_ATTRIBUTION,
-    });
-    map.addLayer({
-      id: 'nolli',
-      type: 'raster',
-      source: 'nolli',
-      paint: { 'raster-opacity': Number(els.nolli.value) / 100, 'raster-fade-duration': 0 },
-    });
-    setNolli();
+    for (const m of HISTORICAL_MAPS) {
+      map.addSource(`map-${m.id}`, {
+        type: 'raster',
+        tiles: [m.tiles.startsWith('/') ? `${location.origin}${m.tiles}` : m.tiles],
+        tileSize: 512,
+        minzoom: m.minzoom,
+        maxzoom: m.maxzoom,
+        bounds: m.bounds,
+        attribution: m.attribution,
+      });
+      map.addLayer({
+        id: `map-${m.id}`,
+        type: 'raster',
+        source: `map-${m.id}`,
+        layout: { visibility: 'none' },
+        paint: { 'raster-opacity': Number(els.mapOpacity.value) / 100, 'raster-fade-duration': 0 },
+      });
+    }
+    mapsReady = true;
+    applyHistoricalMap(Number(els.slider.value));
 
     map.addSource('sites', { type: 'geojson', data: sites });
     map.addLayer({

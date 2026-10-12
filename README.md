@@ -30,8 +30,28 @@ python3 -I data/prep.py data/raw public/sites.geojson
 
 **How dates work.** Wikidata supplies real inception dates (year, decade, or century precision) and wins when both sources describe the same place. Pleiades only provides *period buckets* (e.g. "Roman" starts at 30 BC), so those sites carry `date_precision: "period"` and are drawn faded on the map; their start year is the start of the period, not a construction date.
 
+## Historical maps
+
+The map selector switches between georeferenced historical maps (Auto follows the slider):
+
+| Map | Years shown | Source |
+|---|---|---|
+| Clarke, *Plan of ancient Rome* (1830), a scholarly reconstruction | 753 BC – 476 AD | Stanford `dy213ky1514`, tiled locally |
+| Nolli, *Pianta Grande* (1748) | 1400 – 1799 | Stanford `nn217br6628`, remote XYZ tiles |
+| Clarke, *Plan of modern Rome* (1830) | 1800 – 2025 | Stanford `qs159bn5216`, tiled locally |
+
+The Clarke tiles in `public/tiles/` were made from the Stanford GeoTIFFs with `data/tile_map.py` (Pillow + NumPy, no GDAL):
+
+```bash
+curl -L -o data/raw/dy213ky1514.zip https://stacks.stanford.edu/object/dy213ky1514.zip   # ~285 MB
+unzip -j data/raw/dy213ky1514.zip g0890201.tif -d data/raw/x-ancient
+python3 -I data/tile_map.py data/raw/x-ancient/g0890201.tif public/tiles/clarke-ancient 0.037 0.037 0.975 0.915
+```
+(`qs159bn5216` / `g0890202.tif` / `clarke-modern` for the modern map.) The crop box removes paper margins; the title block, legend and elevation drawings inside the frame remain, so use the opacity slider.
+
 ## Attribution
 - [Pleiades](https://pleiades.stoa.org/) — CC BY
 - [Wikidata](https://www.wikidata.org/) — CC0
 - [La Pianta Grande di Roma (Nolli, 1748), georeferenced](https://purl.stanford.edu/nn217br6628) — University of Oregon / Stanford CSTA, CC BY-NC-SA 4.0 (non-commercial use only)
+- W. B. Clarke, [Plan of ancient Rome](https://purl.stanford.edu/dy213ky1514) and [Plan of modern Rome](https://purl.stanford.edu/qs159bn5216), 1830 — David Rumsey Map Collection, courtesy Stanford University Libraries, CC BY-NC-SA 3.0. Changes: cropped and retiled.
 - [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors — ODbL; basemap tiles via [OpenFreeMap](https://openfreemap.org/)
