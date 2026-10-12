@@ -144,7 +144,10 @@ async function main() {
     els.eraBlurb.textContent = era.blurb;
     els.eras.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.name === era.name));
     if (map.getLayer('sites')) map.setFilter('sites', mapFilter(year));
-    if (map.getLayer('walls')) map.setFilter('walls', ['<=', ['get', 'start_year'], year]);
+    if (map.getLayer('walls')) {
+      map.setFilter('walls', ['all', ['<=', ['get', 'start_year'], year], ['!=', ['get', 'certainty'], 'reconstructed']]);
+      map.setFilter('walls-reconstructed', ['all', ['<=', ['get', 'start_year'], year], ['==', ['get', 'certainty'], 'reconstructed']]);
+    }
     applyHistoricalMap(year);
     const byType = Object.fromEntries(allTypes.map((t) => [t, 0]));
     for (const f of sites.features) {
@@ -265,20 +268,31 @@ async function main() {
       data: walls,
       attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
     });
+    const wallColor = ['match', ['get', 'wall'], ...Object.entries(WALL_COLORS).flat(), '#444444'];
+    const wallWidth = ['interpolate', ['linear'], ['zoom'], 11, 1.5, 16, 4];
+    const startYear = Number(els.slider.value);
+    // Surviving/mapped remains are solid; the circuit traced from Clarke's 1830 plan is dashed.
     map.addLayer({
       id: 'walls',
       type: 'line',
       source: 'walls',
-      filter: ['<=', ['get', 'start_year'], Number(els.slider.value)],
+      filter: ['all', ['<=', ['get', 'start_year'], startYear], ['!=', ['get', 'certainty'], 'reconstructed']],
       layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: {
-        'line-color': ['match', ['get', 'wall'], ...Object.entries(WALL_COLORS).flat(), '#444444'],
-        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1.5, 16, 4],
-        'line-opacity': 0.9,
-      },
+      paint: { 'line-color': wallColor, 'line-width': wallWidth, 'line-opacity': 0.9 },
     });
-    els.wallsToggle.addEventListener('change', () =>
-      map.setLayoutProperty('walls', 'visibility', els.wallsToggle.checked ? 'visible' : 'none'));
+    map.addLayer({
+      id: 'walls-reconstructed',
+      type: 'line',
+      source: 'walls',
+      filter: ['all', ['<=', ['get', 'start_year'], startYear], ['==', ['get', 'certainty'], 'reconstructed']],
+      layout: { 'line-join': 'round' },
+      paint: { 'line-color': wallColor, 'line-width': wallWidth, 'line-opacity': 0.75, 'line-dasharray': [2, 1.5] },
+    });
+    els.wallsToggle.addEventListener('change', () => {
+      const v = els.wallsToggle.checked ? 'visible' : 'none';
+      map.setLayoutProperty('walls', 'visibility', v);
+      map.setLayoutProperty('walls-reconstructed', 'visibility', v);
+    });
 
     map.addSource('sites', { type: 'geojson', data: sites });
     map.addLayer({

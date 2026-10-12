@@ -1,7 +1,12 @@
 """Build public/walls.geojson from the Overpass response in data/raw/walls.json.
 
 Usage (isolated mode, since data/raw holds untrusted downloads):
-    python3 -I data/prep_walls.py data/raw/walls.json public/walls.geojson
+    python3 -I data/prep_walls.py data/raw/walls.json public/walls.geojson [data/servian-traced.geojson]
+
+The optional third argument is the Servian circuit traced from Clarke's 1830
+plan (data/trace_servian.py). OSM only has the surviving fragments, so the
+trace supplies the rest. OSM features get certainty "surviving"; traced ones
+keep certainty "reconstructed" (good to roughly +-40 m).
 
 Fetch the input with data/walls.overpassql, e.g.:
     curl -X POST https://overpass.openstreetmap.fr/api/interpreter \
@@ -33,7 +38,7 @@ def classify(name):
     return None
 
 
-def main(src, out):
+def main(src, out, traced=None):
     elements = json.loads(Path(src).read_text())["elements"]
     feats, skipped = [], Counter()
     for e in elements:
@@ -46,14 +51,17 @@ def main(src, out):
         feats.append({
             "type": "Feature",
             "geometry": {"type": "LineString", "coordinates": [[round(p["lon"], 6), round(p["lat"], 6)] for p in geom]},
-            "properties": {"wall": kind, "name": w["label"], "start_year": w["start_year"], "osm_id": e["id"]},
+            "properties": {"wall": kind, "name": w["label"], "start_year": w["start_year"], "certainty": "surviving",
+                           "source": "osm", "osm_id": e["id"]},
         })
+    if traced:
+        feats.extend(json.loads(Path(traced).read_text())["features"])
     Path(out).write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")))
     print(f"{len(feats)} segments {dict(Counter(f['properties']['wall'] for f in feats))}, skipped {dict(skipped)}")
     print(f"wrote {out} ({Path(out).stat().st_size // 1024} KB)")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         sys.exit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(*sys.argv[1:])

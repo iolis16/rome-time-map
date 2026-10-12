@@ -32,7 +32,7 @@ python3 -I data/prep.py data/raw public/sites.geojson
 
 ### City walls
 
-`public/walls.geojson` comes from OpenStreetMap via Overpass (`data/walls.overpassql`, then `data/prep_walls.py`). Coverage is partial: the Aurelian Wall is ~80% mapped (~15 of ~19 km), while the Servian Wall is only scattered surviving fragments (~1 km of ~11 km). Start dates: Servian 378 BC, Aurelian 271 AD, Leonine 848 AD.
+`public/walls.geojson` comes from OpenStreetMap via Overpass (`data/walls.overpassql`, then `data/prep_walls.py`). Coverage is partial: the Aurelian Wall is ~80% mapped (~15 of ~19 km), while OSM has only ~1 km of the ~11 km Servian Wall (surviving fragments). The rest of the Servian circuit is **traced from the pink line in Clarke's 1830 plan** (`data/trace_servian.py`, saved as `data/servian-traced.geojson`) and drawn dashed. It is a 19th-century reconstruction plus trace error: surviving OSM fragments sit mostly 30–50 m from it, so treat it as good to roughly ±40 m. The traced line has gaps where Clarke's ink is faint or hidden under labels. Start dates: Servian 378 BC, Aurelian 271 AD, Leonine 848 AD.
 
 ## Historical maps
 
